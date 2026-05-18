@@ -6,24 +6,22 @@ import random
 from tqdm import tqdm
 import os
 
-# ========= CONFIG =========
+
 API_KEYS = [
     "71449a0c6a4bf546c700d8152502b01a9a1e2958747c1bd406bc0558d9ec3a1f",
     "56a4428921126bfb2ddb68f2de2e4923bce0a16e4d9a3bba1097e2f732c50250",
     "3e497dd5a127bb3aa38a831cd261b76f9b8f7637c6285677fde0c48c3058929d",
     "rfRRSHFqzpJyv396fwPWGVRK"
-]  # <-- Replace with your actual SerpAPI keys
+]  
 INPUT_FILE = "Growth For Impact Data Assignment.xlsx"
 OUTPUT_FILE = "Enriched_Companies_Wide.xlsx"
-BATCH_SIZE = 50          # number of companies per batch
+BATCH_SIZE = 50         
 SLEEP_MIN = 1
 SLEEP_MAX = 3
 MAX_JOBS = 3
 RETRIES = 3
-TIMEOUT = 30             # seconds
-# ==========================
+TIMEOUT = 30             
 
-# --- SerpAPI search with key rotation and retries ---
 def serp_search(query, company_index, retries=RETRIES):
     url = "https://serpapi.com/search.json"
     current_key = API_KEYS[company_index % len(API_KEYS)]
@@ -43,7 +41,7 @@ def serp_search(query, company_index, retries=RETRIES):
             time.sleep(5)
     return None
 
-# --- Find pages ---
+
 def find_website(company, index):
     return serp_search(f"{company} official site", index)
 
@@ -67,7 +65,7 @@ def identify_jobs_page(careers_url):
         pass
     return careers_url
 
-# --- Scrape up to MAX_JOBS jobs ---
+
 def scrape_jobs(jobs_url, max_jobs=MAX_JOBS):
     if not jobs_url:
         return []
@@ -88,7 +86,7 @@ def scrape_jobs(jobs_url, max_jobs=MAX_JOBS):
         print("Job scrape error:", e)
         return jobs
 
-# --- Main enrichment ---
+
 def enrich_data(df):
     enriched_rows, jobs_data = [], []
     for i, row in tqdm(df.iterrows(), total=len(df), desc="Companies"):
@@ -124,11 +122,11 @@ def enrich_data(df):
                 **job
             })
 
-        time.sleep(random.uniform(SLEEP_MIN, SLEEP_MAX))  # polite delay
+        time.sleep(random.uniform(SLEEP_MIN, SLEEP_MAX))  
 
     return pd.DataFrame(enriched_rows), pd.DataFrame(jobs_data)
 
-# --- Merge jobs into wide format ---
+
 def merge_jobs(enriched_df, jobs_df, max_jobs=MAX_JOBS):
     merged_rows = []
     for _, row in enriched_df.iterrows():
@@ -148,7 +146,7 @@ def merge_jobs(enriched_df, jobs_df, max_jobs=MAX_JOBS):
 
     return pd.DataFrame(merged_rows)
 
-# --- Run in batches ---
+
 if __name__ == "__main__":
     df = pd.read_excel(INPUT_FILE, sheet_name=0)
     all_enriched, all_jobs = pd.DataFrame(), pd.DataFrame()
@@ -162,7 +160,7 @@ if __name__ == "__main__":
         all_enriched = pd.concat([all_enriched, enriched_df], ignore_index=True)
         all_jobs = pd.concat([all_jobs, jobs_df], ignore_index=True)
 
-        # Save intermediate wide-format file
+        
         final_df = merge_jobs(all_enriched, all_jobs, max_jobs=MAX_JOBS)
         with pd.ExcelWriter(OUTPUT_FILE, engine="openpyxl") as writer:
             final_df.to_excel(writer, sheet_name="Companies", index=False)
