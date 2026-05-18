@@ -8,10 +8,8 @@ import os
 
 
 API_KEYS = [
-    "71449a0c6a4bf546c700d8152502b01a9a1e2958747c1bd406bc0558d9ec3a1f",
-    "56a4428921126bfb2ddb68f2de2e4923bce0a16e4d9a3bba1097e2f732c50250",
-    "3e497dd5a127bb3aa38a831cd261b76f9b8f7637c6285677fde0c48c3058929d",
-    "rfRRSHFqzpJyv396fwPWGVRK"
+    "*************",
+    "*************"
 ]  
 INPUT_FILE = "Growth For Impact Data Assignment.xlsx"
 OUTPUT_FILE = "Enriched_Companies_Wide.xlsx"
